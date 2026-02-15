@@ -1,0 +1,35 @@
+{% extends "base.html" %}
+
+{% block content %}
+<h2>My Incidents</h2>
+<a href="{{ url_for('user_dashboard') }}">Back to Dashboard</a>
+
+{% if incidents %}
+<table class="data-table">
+    <thead>
+        <tr>
+            <th>Title</th>
+            <th>Status</th>
+            <th>Priority</th>
+            <th>Risk Level</th>
+            <th>Date</th>
+            <th>Action</th>
+        </tr>
+    </thead>
+    <tbody>
+        {% for incident in incidents %}
+        <tr>
+            <td>{{ incident.title }}</td>
+            <td class="status-{{ incident.status|lower }}">{{ incident.status }}</td>
+            <td class="priority-{{ incident.priority|lower }}">{{ incident.priority }}</td>
+            <td>{{ incident.risk_level }}</td>
+            <td>{{ incident.created_at.strftime('%Y-%m-%d') }}</td>
+            <td><a href="{{ url_for('incident_status', id=incident.id) }}">View Status</a></td>
+        </tr>
+        {% endfor %}
+    </tbody>
+</table>
+{% else %}
+<p>No incidents reported yet.</p>
+{% endif %}
+{% endblock %}

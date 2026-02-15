@@ -1,0 +1,25 @@
+<div class="rank-container">
+    <h3>Global Incident Rankings</h3>
+    <table class="data-table">
+        <thead>
+            <tr>
+                <th>Rank</th>
+                <th>Title</th>
+                <th>Priority</th>
+                <th>Risk Level</th>
+                <th>Status</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for incident in incidents %}
+            <tr>
+                <td>{{ loop.index }}</td>
+                <td>{{ incident.title }}</td>
+                <td class="priority-{{ incident.priority|lower }}">{{ incident.priority }}</td>
+                <td>{{ incident.risk_level }}</td>
+                <td>{{ incident.status }}</td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</div>
