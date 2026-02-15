@@ -1,0 +1,14 @@
+<div class="profile-container">
+    <h3>Admin Profile</h3>
+    <form method="POST" action="{{ url_for('admin_profile') }}">
+        <div class="form-group">
+            <label>Full Name</label>
+            <input type="text" name="full_name" value="{{ current_user.full_name }}">
+        </div>
+        <div class="form-group">
+            <label>New Password</label>
+            <input type="password" name="password" placeholder="Leave blank to keep current">
+        </div>
+        <button type="submit">Update Profile</button>
+    </form>
+</div>

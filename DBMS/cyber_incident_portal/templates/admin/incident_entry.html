@@ -1,0 +1,112 @@
+<div class="incident-entry-container">
+    <h3>Incident Verification & Entry</h3>
+
+    <div class="search-box">
+        <input type="text" id="incidentSearch" placeholder="Enter Incident ID to Verify...">
+        <button onclick="verifyIncident()">Verify</button>
+        <button onclick="startVoiceEntry()" class="voice-btn"><i class="fas fa-microphone"></i> Voice Access</button>
+    </div>
+
+    <div id="verificationResult" style="display:none; margin-top:20px; border:1px solid #ddd; padding:15px;">
+        <h4>Incident Details</h4>
+        <p><strong>ID:</strong> <span id="verId"></span></p>
+        <p><strong>User:</strong> <span id="verUser"></span></p>
+        <p><strong>Title:</strong> <span id="verTitle"></span></p>
+        <p><strong>Description:</strong> <span id="verDesc"></span></p>
+
+        <hr>
+
+        <h4>Handling</h4>
+        <form method="POST" action="{{ url_for('admin_incident_entry') }}" id="handlingForm">
+            <input type="hidden" name="incident_id" id="hiddenId">
+
+            <div class="form-group">
+                <label>Status</label>
+                <select name="status" id="statusSelect" onchange="highlightNext('remarks')">
+                    <option value="Verified">Verified</option>
+                    <option value="Handling">Handling</option>
+                    <option value="Closed">Closed</option>
+                </select>
+            </div>
+
+            <div class="form-group">
+                <label>Remarks</label>
+                <textarea name="remarks" id="remarks" onblur="autoCalculate()"></textarea>
+            </div>
+
+            <div class="form-group">
+                <label>Priority (Auto-Assigned)</label>
+                <input type="text" name="priority" id="priority" readonly>
+            </div>
+
+            <div class="form-group">
+                <label>Risk Level (Auto-Assigned)</label>
+                <input type="text" name="risk_level" id="riskLevel" readonly>
+            </div>
+
+            <button type="submit">Update Incident</button>
+        </form>
+    </div>
+</div>
+
+<script>
+    function verifyIncident() {
+        const id = document.getElementById('incidentSearch').value;
+        // AJAX call to fetch incident details would go here.
+        // For demo/prototype, I'll simulate a fetch if I had an API.
+        // Since I don't have a JSON API, I'll assume the admin searches and the page reloads or uses a hidden list.
+        // To make it "Single page feel", I should probably use fetch to a new API endpoint.
+        // I will add a simple API endpoint in app.py for this.
+        fetch(`/api/incident/${id}`)
+            .then(response => response.json())
+            .then(data => {
+                if (data.error) {
+                    alert(data.error);
+                } else {
+                    document.getElementById('verificationResult').style.display = 'block';
+                    document.getElementById('verId').textContent = data.id;
+                    document.getElementById('verUser').textContent = data.user;
+                    document.getElementById('verTitle').textContent = data.title;
+                    document.getElementById('verDesc').textContent = data.description;
+                    document.getElementById('hiddenId').value = data.id;
+                }
+            })
+            .catch(err => alert('Incident not found or error.'));
+    }
+
+    function startVoiceEntry() {
+        // Web Speech API
+        const recognition = new (window.SpeechRecognition || window.webkitSpeechRecognition)();
+        recognition.lang = 'en-US';
+        recognition.start();
+
+        recognition.onresult = function (event) {
+            const transcript = event.results[0][0].transcript;
+            console.log("Voice Input: ", transcript);
+            if (document.activeElement && document.activeElement.tagName === 'TEXTAREA') {
+                document.activeElement.value = transcript;
+            } else {
+                alert("Voice input: " + transcript + ". Click a field to fill.");
+            }
+        };
+    }
+
+    function autoCalculate() {
+        // Mock auto calculation
+        const priority = ['Normal', 'High', 'Critical'][Math.floor(Math.random() * 3)];
+        const risk = ['Low', 'Medium', 'High'][Math.floor(Math.random() * 3)];
+        document.getElementById('priority').value = priority;
+        document.getElementById('riskLevel').value = risk;
+
+        // Color coding
+        const pInput = document.getElementById('priority');
+        if (priority === 'Critical') pInput.style.color = 'red';
+        else if (priority === 'High') pInput.style.color = 'orange';
+        else pInput.style.color = 'green';
+    }
+
+    function highlightNext(nextId) {
+        document.getElementById(nextId).focus();
+        document.getElementById(nextId).style.border = "2px solid blue";
+    }
+</script>
